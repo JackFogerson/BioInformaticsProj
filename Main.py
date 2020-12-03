@@ -69,25 +69,27 @@ def computeTree(array):
         [array[3][0],array[3][1],array[3][2]]
     ]
 
+    #distance array for adding branch lengths
+    distances = [0,0,0,0]
+
     #while labels are avaliable to be joined
-    print("table being analyzed:")
-    print(arrayData)
     while len(labels) > 1:
+        print("table being analyzed:")
+        for i in range(len(arrayData)):
+            print(arrayData[i])
         #find lowest value
         x,y = lowValue(arrayData)
 
         #merges array entries for x,y by averaging data
-        mergeArray(arrayData,x,y,labels)
-
-        print("new table:")
-        print(arrayData)
+        distances[x] = abs((arrayData[x][y]/2)-distances[x])
+        distances[y] = abs((arrayData[x][y]/2)-distances[y])
+        mergeArray(arrayData,x,y,labels,distances)
 
     return labels[0]
 
 
 #returns pairwise distance for compared sequences
 def pairwise(seq1, seq2):
-    #TODO - logic for substitutions
     return sum(x != y for x, y in zip(seq1, seq2))
 
 #finds location of lowest value in array
@@ -104,3 +106,43 @@ def lowValue(array):
                 x,y = i,j
     return x,y
 
+
+# merges array entries for x,y by averaging data
+def mergeArray(array,x,y,labels,distance):
+    #makes sure array is only worked on left side
+    if y<x:
+        x,y = y,x
+
+    distancex = distance[x]
+    distancey = distance[y]
+    distancex = str(distancex)
+    distancey = str(distancey)
+    #create new label for merged data
+    labels[x] = "(" + labels[x] + ":" + distancex + "," + labels[y] + ":" + distancey + ")"
+
+    #recontruct the x row
+    row = []
+    for i in range(0,x):
+        row.append((array[x][i] + array[y][i])/2)
+    array[x] = row
+
+    #reconstruct x column
+    for i in range(x+1,y):
+        array[i][x] = (array[i][x] + array[y][i])/2
+
+    for i in range(y+1, len(array)):
+        array[i][x] = (array[i][x] + array[i][y])/2
+        #since data merged, delete leftover column
+        del array[i][y]
+
+    #since data merged, delete leftover row
+    del array[y]
+
+    #delete old label
+    del labels[y]
+
+    del distance[y]
+
+if __name__ == '__main__':
+    print("Comparing sequences of neurodegenerative prion diseases...")
+    sequenceCompare()
