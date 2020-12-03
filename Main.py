@@ -4,15 +4,13 @@ import numpy
 
 #compares sequences and adds to matrix
 def sequenceCompare():
-    #TODO - get sequences
-    sequenceA = 'abcde'
-    sequenceB = 'abcwe'
-    sequenceC = 'agfde'
-    sequenceD = 'zzzwe'
-    sequenceE = 'agfre'
+    sequenceCJD = 'MANLGCWMLVLFVATWSDLGLCKKRPKPGGWNTGGSRYPGQGSPGGNRYPPQGGGGWGQPHGGGWGQPHGGGWGQPHGGGWGQPHGGGWGQGGGTHSQWNKPSKPKTNMKHMAGAAAAGAVVGGLGGYVLGSAMSRPIIHFGSDYEDRYYRENMHRYPNQVYYRPMDEYSNQNNFVHNCVNITIKQHTVTTTTKGENFTETDVKMMERVVEQMCITQYERESQAYYQRGSSMVLFSSPPVILLISFLIFL'
+    sequenceFFI = 'MANLGCWMLVLFVATWSDLGLCKKRPKPGGWNTGGSRYPGQGSPGGNRYPPQGGGGWGQPHGGGWGQPHGGGWGQPHGGGWGQPHGGGWGQGGGTHSQWNKPSKPKTNMKHMAGAAAAGAVVGGLGGYMLGSAMSRPIIHFGSDYEDRYYRENMHRYPNQVYYRPMDEYSNQNNFVHNCVNITIKQHTVTTTTKGENFTETDVKMMERVVEQMCITQYERESQAYYQRGSSMVLFSSPPVILLISFLIFL'
+    sequenceGSD = 'MANLGCWMLVLFVATWSDLGLCKKRPKPGGWNTGGSRYPGQGSPGGNRYPPQGGGGWGQPHGGGWGQPHGGGWGQPHGGGWGQPHGGGWGQGGGTHSQWNKLSKPKTNMKHMAGAAAAGAVVGGLGGYMLGSAMSRPIIHFGSDYEDRYYRENMHRYPNQVYYRPMDEYSNQNNFVHDCVNITIKQHTVTTTTKGENFTETDVKMMERVVEQMCITQYERESQAYYQRGSSMVLFSSPPVILLISFLIFL'
+    sequencePrion = 'MANLGCWMLVLFVATWSDLGLCKKRPKPGGWNTGGSRYPGQGSPGGNRYPPQGGGGWGQPHGGGWGQPHGGGWGQPHGGGWGQPHGGGWGQGGGTHSQWNKPSKPKTNMKHMAGAAAAGAVVGGLGGYMLGSAMSRPIIHFGSDYEDRYYRENMHRYPNQVYYRPMDEYSNQNNFVHDCVNITIKQHTVTTTTKGENFTETDVKMMERVVEQMCITQYERESQAYYQRGSSMVLFSSPPVILLISFLIFL'
 
     #add sequences to array and get length
-    sequence_list = [sequenceA, sequenceB, sequenceC, sequenceD, sequenceE]
+    sequence_list = [sequenceCJD, sequenceFFI, sequenceGSD, sequencePrion]
     n = len(sequence_list)
 
     #make a numpy array of size n x n
@@ -31,15 +29,16 @@ def sequenceCompare():
     tree.write(treeContent)
     drawTree(treeContent)
 
+    #legend
+    print("a-CJD Sequence")
+    print("b-FFI Sequence")
+    print("c-GSD Sequence")
+    print("d-Normal Prion Sequence")
+
     #takes tree file and constructs a tree using biopython
 def drawTree(treeFile):
     tree = Phylo.read(StringIO(treeFile),"newick")
     Phylo.draw_ascii(tree)
-
-def getSequence(name):
-    #TODO - add sequences
-    sequence = ""
-    return sequence
 
 #makes a upgma array using pairwise distances between sequences
 def makeArray(list, array):
@@ -55,11 +54,11 @@ def makeArray(list, array):
             array[j, i] = distance
     return array
 
-#use upgma array to implement upgma
+#use upgma array to implement upgma algorithm
 def computeTree(array):
     #create labels for use in Array and tree
     labels = []
-    for i in range(ord("A"), ord("E")+1):
+    for i in range(ord("A"), ord("D")+1):
         labels.append(chr(i))
 
     #get lower triangular matrix
@@ -67,8 +66,7 @@ def computeTree(array):
         [],
         [array[1][0]],
         [array[2][0],array[2][1]],
-        [array[3][0],array[3][1],array[3][2]],
-        [array[4][0],array[4][1],array[4][2],array[4][3]]
+        [array[3][0],array[3][1],array[3][2]]
     ]
 
     #distance array for adding branch lengths
@@ -76,7 +74,7 @@ def computeTree(array):
 
     #while labels are avaliable to be joined
     while len(labels) > 1:
-        print("table being analyzed:")
+        print("\nTable being analyzed:")
         for i in range(len(arrayData)):
             print(arrayData[i])
         #find lowest value
@@ -113,7 +111,7 @@ def lowValue(array):
 
 # merges array entries for x,y by averaging data
 def mergeArray(array,x,y,labels,distance,distancex,distancey):
-    #makes sure array is only worked on left side
+    #makes sure array is only worked on left side, swap if not
     if y<x:
         x,y = y,x
         tempy = distancey
@@ -146,8 +144,9 @@ def mergeArray(array,x,y,labels,distance,distancex,distancey):
     #delete old label
     del labels[y]
 
+    #delete old distance
     del distance[y]
 
 if __name__ == '__main__':
-    print("Comparing sequences of neurodegenerative prion diseases...")
+    print("Comparing sequences of neurodegenerative prion diseases...\n")
     sequenceCompare()
