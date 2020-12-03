@@ -7,11 +7,12 @@ def sequenceCompare():
     #TODO - get sequences
     sequenceA = 'abcde'
     sequenceB = 'abcwe'
-    sequenceC = 'abfde'
+    sequenceC = 'agfde'
     sequenceD = 'zzzwe'
+    sequenceE = 'agfre'
 
     #add sequences to array and get length
-    sequence_list = [sequenceA, sequenceB, sequenceC, sequenceD]
+    sequence_list = [sequenceA, sequenceB, sequenceC, sequenceD, sequenceE]
     n = len(sequence_list)
 
     #make a numpy array of size n x n
@@ -58,7 +59,7 @@ def makeArray(list, array):
 def computeTree(array):
     #create labels for use in Array and tree
     labels = []
-    for i in range(ord("A"), ord("D")+1):
+    for i in range(ord("A"), ord("E")+1):
         labels.append(chr(i))
 
     #get lower triangular matrix
@@ -66,11 +67,12 @@ def computeTree(array):
         [],
         [array[1][0]],
         [array[2][0],array[2][1]],
-        [array[3][0],array[3][1],array[3][2]]
+        [array[3][0],array[3][1],array[3][2]],
+        [array[4][0],array[4][1],array[4][2],array[4][3]]
     ]
 
     #distance array for adding branch lengths
-    distances = [0,0,0,0]
+    distances = [0,0,0,0,0]
 
     #while labels are avaliable to be joined
     while len(labels) > 1:
@@ -81,9 +83,11 @@ def computeTree(array):
         x,y = lowValue(arrayData)
 
         #merges array entries for x,y by averaging data
-        distances[x] = abs((arrayData[x][y]/2)-distances[x])
-        distances[y] = abs((arrayData[x][y]/2)-distances[y])
-        mergeArray(arrayData,x,y,labels,distances)
+        distancesx = (arrayData[x][y]/2)-distances[x]
+        distancesy = (arrayData[x][y]/2)-distances[y]
+        distances[x] = (arrayData[x][y]/2)
+        distances[y] = (arrayData[x][y]/2)
+        mergeArray(arrayData,x,y,labels,distances,distancesx,distancesy)
 
     return labels[0]
 
@@ -108,13 +112,14 @@ def lowValue(array):
 
 
 # merges array entries for x,y by averaging data
-def mergeArray(array,x,y,labels,distance):
+def mergeArray(array,x,y,labels,distance,distancex,distancey):
     #makes sure array is only worked on left side
     if y<x:
         x,y = y,x
+        tempy = distancey
+        distancey = distancex
+        distancex = tempy
 
-    distancex = distance[x]
-    distancey = distance[y]
     distancex = str(distancex)
     distancey = str(distancey)
     #create new label for merged data
